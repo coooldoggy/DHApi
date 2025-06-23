@@ -13,16 +13,6 @@ servers:
   - url: https://tapi.kbchahub.com
     description: 개발 서버
 
-components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-DATAHUB-Client-Id
-    ApiSecretAuth:
-      type: apiKey
-      in: header
-      name: X-DATAHUB-Client-Secret
 
 security:
   - ApiKeyAuth: []
@@ -107,6 +97,15 @@ paths:
         - 매물등록
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-DATAHUB-Client-Id
+    ApiSecretAuth:
+      type: apiKey
+      in: header
+      name: X-DATAHUB-Client-Secret
   schemas:
     CarRegisterRequest:
       type: object
