@@ -1,0 +1,190 @@
+
+openapi: 3.0.0
+info:
+  title: DataHub 매물연동 API
+  version: "1.0.0"
+  description: |
+    KB차차차의 DataHub 매물연동 API입니다.
+    차량 매물 등록, 수정, 공통코드 조회 등의 기능을 제공합니다.
+
+servers:
+  - url: https://api.kbchahub.com
+    description: 운영 서버
+  - url: https://tapi.kbchahub.com
+    description: 개발 서버
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-DATAHUB-Client-Id
+    ApiSecretAuth:
+      type: apiKey
+      in: header
+      name: X-DATAHUB-Client-Secret
+
+security:
+  - ApiKeyAuth: []
+    ApiSecretAuth: []
+
+paths:
+  /api/partner/common/code/list.json:
+    post:
+      summary: 공통코드 조회
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_code:
+                  type: string
+                  example: "004"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                  error_msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      group_code:
+                        type: string
+                      group_name:
+                        type: string
+                      codes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                            name:
+                              type: string
+      tags:
+        - 공통코드
+
+  /api/partner/car/regist.json:
+    post:
+      summary: 매물 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarRegisterRequest'
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                  error_msg:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      partner_car_seq:
+                        type: string
+                      demo_no:
+                        type: string
+                      kbc_car_seq:
+                        type: string
+      tags:
+        - 매물등록
+
+components:
+  schemas:
+    CarRegisterRequest:
+      type: object
+      required:
+        - partner_code
+        - demo_no
+        - shop_name
+        - work_no
+        - emp_name
+        - emp_hand
+        - car_no
+        - good_no
+        - maker_code
+        - class_code
+        - car_code
+        - model_code
+        - maker_name
+        - class_name
+        - car_name
+        - model_name
+        - auto_gbn
+        - yymm
+        - km
+        - color
+        - gas
+        - demo_amt
+        - tax_default_info
+      properties:
+        partner_code:
+          type: string
+        demo_no:
+          type: string
+        shop_name:
+          type: string
+        work_no:
+          type: string
+        emp_name:
+          type: string
+        emp_hand:
+          type: string
+        car_no:
+          type: string
+        good_no:
+          type: string
+        maker_code:
+          type: string
+        class_code:
+          type: string
+        car_code:
+          type: string
+        model_code:
+          type: string
+        maker_name:
+          type: string
+        class_name:
+          type: string
+        car_name:
+          type: string
+        model_name:
+          type: string
+        auto_gbn:
+          type: string
+        yymm:
+          type: string
+        km:
+          type: string
+        color:
+          type: string
+        gas:
+          type: string
+        demo_amt:
+          type: string
+        tax_default_info:
+          type: string
+        photos:
+          type: array
+          items:
+            type: object
+            properties:
+              photo:
+                type: string
