@@ -10,7 +10,7 @@ info:
 servers:
   - url: https://api.kbchahub.com
     description: 운영 서버
-  - url: https://tapi.kbchahub.com
+  - url: https://tapi.kbchahub.com:10443
     description: 개발 서버
 
 

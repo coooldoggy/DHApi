@@ -1,0 +1,106 @@
+
+
+openapi: 3.0.0
+info:
+  title: DataHub GOV API (데이터허브 조합 사진전송)
+  version: "2026-03-25"
+  description: |
+    데이터허브 조합 사진전송 등록 API.
+    **공통 설정**은 연계 API 사용설명서 > 공통설정을 참조하세요.
+
+servers:
+  - url: https://api.kbchahub.com
+    description: 운영 서버
+  - url: https://tapi.kbchahub.com
+    description: 개발 서버
+
+
+security:
+  - ApiKeyAuth: []
+    ApiSecretAuth: []
+
+paths:
+  /api/datahub/gov/photo/send/regist.json:
+    post:
+      summary: 데이터허브 조합 사진전송
+      description: |
+        헤더에 발급받은 API Key, Secret을 설정합니다.
+      tags:
+        - 사진전송
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoSendRequest'
+            example:
+              danji_no: "420"
+              car_no: "33 주 7964"
+      responses:
+        "200":
+          description: 응답 (error.error_code 0000이면 정상)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoSendResponse'
+              example:
+                data: {}
+                error:
+                  error_code: "0000"
+                  message: ""
+                  details: ""
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-DATAHUB-Client-Id
+    ApiSecretAuth:
+      type: apiKey
+      in: header
+      name: X-DATAHUB-Client-Secret
+  schemas:
+    PhotoSendRequest:
+      type: object
+      required:
+        - danji_no
+        - car_no
+      properties:
+        danji_no:
+          type: string
+          description: 단지번호
+        car_no:
+          type: string
+          description: 차량번호
+    PhotoSendError:
+      type: object
+      properties:
+        error_code:
+          type: string
+          description: |
+            오류 코드
+            | 코드 | 설명 |
+            |------|------|
+            | 0000 | 정상 |
+            | 1001 | 필수값 누락(차량번호) |
+            | 1002 | 필수값 누락(단지번호) |
+            | 2001 | 차량정보가 잘못되었습니다. |
+            | 3001 | 사진전송에 실패하였습니다. |
+            | 9999 | 기타오류 |
+        message:
+          type: string
+          description: 에러명
+        details:
+          type: string
+    PhotoSendResponse:
+      type: object
+      properties:
+        data:
+          type: object
+        error:
+          $ref: '#/components/schemas/PhotoSendError'
+
+tags:
+  - name: 사진전송
+    description: 데이터허브 조합 사진전송
