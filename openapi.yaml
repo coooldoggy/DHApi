@@ -2,7 +2,7 @@
 openapi: 3.0.0
 info:
   title: DataHub 매물연동 API
-  version: "1.0.0"
+  version: "1.0.1"
   description: |
     KB차차차의 DataHub 매물연동 API입니다.
     차량 매물 등록, 수정, 공통코드 조회 등의 기능을 제공합니다.
@@ -10,7 +10,7 @@ info:
 servers:
   - url: https://api.kbchahub.com
     description: 운영 서버
-  - url: https://tapi.kbchahub.com
+  - url: https://tapi.kbchahub.com:10443
     description: 개발 서버
 
 
@@ -22,13 +22,20 @@ paths:
   /api/partner/common/code/list.json:
     post:
       summary: 공통코드 조회
+      tags:
+        - 공통코드
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - partner_code
+                - group_code
               properties:
+                partner_code:
+                  type: string
                 group_code:
                   type: string
                   example: "004"
@@ -60,12 +67,12 @@ paths:
                               type: string
                             name:
                               type: string
-      tags:
-        - 공통코드
 
   /api/partner/car/regist.json:
     post:
       summary: 매물 등록
+      tags:
+        - 매물등록
       requestBody:
         required: true
         content:
@@ -93,8 +100,82 @@ paths:
                         type: string
                       kbc_car_seq:
                         type: string
+
+  /api/partner/car/modify.json:
+    post:
+      summary: 매물 수정
+      description: |
+        기존 시스템으로 등록한 매물은 수정이 불가합니다.
       tags:
-        - 매물등록
+        - 매물수정
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarModifyRequest'
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                  error_msg:
+                    type: string
+
+  /api/partner/car/photo/modify.json:
+    post:
+      summary: 매물 수정 - 사진정보
+      tags:
+        - 매물수정
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoModifyRequest'
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                  error_msg:
+                    type: string
+
+  /api/partner/car/sell.json:
+    post:
+      summary: 판매등록
+      description: |
+        DataHub에 등록되지 않은 차량번호에 대한 판매완료 처리는 일정 기간만 허용됩니다.
+      tags:
+        - 판매등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SellRequest'
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: string
+                  error_msg:
+                    type: string
 
 components:
   securitySchemes:
@@ -132,19 +213,33 @@ components:
         - color
         - gas
         - demo_amt
-        - tax_default_info
+        - danji_name
       properties:
         partner_code:
           type: string
         demo_no:
           type: string
+        danji_no:
+          type: string
+        danji_name:
+          type: string
+        shop_no:
+          type: string
         shop_name:
           type: string
         work_no:
           type: string
+        emp_no:
+          type: string
         emp_name:
           type: string
         emp_hand:
+          type: string
+        license_no:
+          type: string
+        license_from_day:
+          type: string
+        license_to_day:
           type: string
         car_no:
           type: string
@@ -166,7 +261,11 @@ components:
           type: string
         model_name:
           type: string
+        grade_name:
+          type: string
         auto_gbn:
+          type: string
+        regi_day:
           type: string
         yymm:
           type: string
@@ -174,11 +273,183 @@ components:
           type: string
         color:
           type: string
+        color_name:
+          type: string
         gas:
+          type: string
+        num_cc:
+          type: string
+        check_no:
+          type: string
+        check_url:
+          type: string
+        car_desc:
+          type: string
+        str_demo_day:
+          type: string
+        car_option:
           type: string
         demo_amt:
           type: string
         tax_default_info:
+          type: string
+        sellAmtGbn:
+          type: string
+          description: "109100 - 현금, 109110 - 리스. 리스일 경우 demoAmt는 0"
+        leaseGbn:
+          type: string
+          description: "sellAmtGbn이 리스(109110)일 경우 필수. 121100 - 운용리스, 121110 - 금융리스"
+        leaseGbnName:
+          type: string
+        takeOverAmt:
+          type: integer
+          description: "인수비용"
+        depositAmt:
+          type: integer
+          description: "보증금"
+        monthLeaseAmt:
+          type: string
+          description: "월리스료"
+        scrapValueAmt:
+          type: string
+          description: "잔존가치"
+        fromLeasePeriod:
+          type: string
+          description: "리스기간 시작 (yyyymm)"
+        toLeasePeriod:
+          type: string
+          description: "리스기간 끝 (yyyymm)"
+        remainLeasePeriod:
+          type: string
+          description: "잔여리스기간 (mm)"
+        reaminAmt:
+          type: string
+          description: "미회수원금"
+        totalLeasePeriod:
+          type: string
+          description: "총리스기간"
+        leasePayGbn:
+          type: string
+          description: "DEPOSIT/PREPAY - 보증금/선수금 구분. 운용리스일 경우 선택 필요, 금융리스는 보증금 고정"
+        photos:
+          type: array
+          items:
+            type: object
+            properties:
+              photo:
+                type: string
+
+    CarModifyRequest:
+      type: object
+      required:
+        - partner_code
+        - partner_car_seq
+        - demo_no
+        - good_no
+        - maker_code
+        - class_code
+        - car_code
+        - model_code
+        - maker_name
+        - class_name
+        - car_name
+        - model_name
+        - km
+        - color
+        - demo_amt
+        - tax_default_info
+      properties:
+        partner_code:
+          type: string
+        partner_car_seq:
+          type: string
+        demo_no:
+          type: string
+        good_no:
+          type: string
+        maker_code:
+          type: string
+        class_code:
+          type: string
+        car_code:
+          type: string
+        model_code:
+          type: string
+        grade_code:
+          type: string
+        maker_name:
+          type: string
+        class_name:
+          type: string
+        car_name:
+          type: string
+        model_name:
+          type: string
+        grade_name:
+          type: string
+        km:
+          type: string
+        color:
+          type: string
+        color_name:
+          type: string
+        check_url:
+          type: string
+        demo_amt:
+          type: string
+        car_desc:
+          type: string
+        tax_default_info:
+          type: string
+        str_demo_day:
+          type: string
+        car_option:
+          type: string
+        sellAmtGbn:
+          type: string
+          description: "109100 - 현금, 109110 - 리스. 리스일 경우 demoAmt는 0"
+        leaseGbn:
+          type: string
+          description: "sellAmtGbn이 리스(109110)일 경우 필수. 121100 - 운용리스, 121110 - 금융리스"
+        leaseGbnName:
+          type: string
+        takeOverAmt:
+          type: integer
+          description: "인수비용"
+        depositAmt:
+          type: integer
+          description: "보증금"
+        monthLeaseAmt:
+          type: string
+          description: "월리스료"
+        scrapValueAmt:
+          type: string
+          description: "잔존가치"
+        fromLeasePeriod:
+          type: string
+          description: "리스기간 시작 (yyyymm)"
+        toLeasePeriod:
+          type: string
+          description: "리스기간 끝 (yyyymm)"
+        remainLeasePeriod:
+          type: string
+          description: "잔여리스기간 (mm)"
+        reaminAmt:
+          type: string
+          description: "미회수원금"
+        totalLeasePeriod:
+          type: string
+          description: "총 리스 기간"
+        leasePayGbn:
+          type: string
+          description: "DEPOSIT/PREPAY - 보증금/선수금 구분. 운용리스일 경우 선택 필요, 금융리스는 보증금 고정"
+
+    PhotoModifyRequest:
+      type: object
+      properties:
+        partner_code:
+          type: string
+        partner_car_seq:
           type: string
         photos:
           type: array
@@ -187,3 +458,17 @@ components:
             properties:
               photo:
                 type: string
+
+    SellRequest:
+      type: object
+      properties:
+        partner_code:
+          type: string
+        param_gbn:
+          type: string
+          description: "partner_car_seq 또는 car_no"
+          enum:
+            - partner_car_seq
+            - car_no
+        param_value:
+          type: string
